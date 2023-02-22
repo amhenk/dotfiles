@@ -8,6 +8,8 @@ vim.keymap.set("i", "<C-c>", "<Esc>")
 
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
 vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
+vim.keymap.set("n", "<C-j>", "5j", { remap=true, silent=true })
+vim.keymap.set("n", "<C-k>", "5k")
 
 vim.keymap.set("n", "J", "mzJ`z")
 

@@ -35,4 +35,4 @@ git clone https://github.com/romkatv/powerlevel10k.git $HOME/.oh-my-zsh/custom/t
 source $ZSH/oh-my-zsh.sh
 
 git config --global core.editor nvim
-git config --global user.name 'Chad Cole'
+git config --global user.name 'Alex Henkemeier'
