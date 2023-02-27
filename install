@@ -1,13 +1,18 @@
 #!/usr/bin/env zsh
 
-cp -fs ~/dotfiles/terminal/tmux.conf ~/.tmux.conf
-cp -fs ~/dotfiles/terminal/zshrc ~/.zshrc
+rm ~/.tmux.conf
+rm ~/.zshrc
+
+ln -s ~/dotfiles/terminal/tmux.conf ~/.tmux.conf
+ln -s ~/dotfiles/terminal/zshrc ~/.zshrc
 
 if [ ! -d "~/.tmux/plugins/tpm" ] ; then
   git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 fi
 
 # Neovim
+echo
+echo '> Configuring Neovim'
 if [ ! $SPIN ]; then
     brew install --HEAD neovim
 fi
@@ -15,11 +20,12 @@ fi
 rm -rf ~/.config/nvim
 
 # create a sym link to the nvim config
-cp -rs ~/dotfiles/nvim ~/.config/
+ln -s ~/dotfiles/nvim ~/.config/nvim
 
 nvim --headless -c 'autocmd User PackerComplete quitall' -c 'PackerSync'
 
-# zsh setup
+echo
+echo '> Configuring oh-my-zsh'
 if test -d ~/.oh-my-zsh; then
     rm -rf ~/.oh-my-zsh
 fi
@@ -36,5 +42,18 @@ git clone https://github.com/romkatv/powerlevel10k.git $HOME/.oh-my-zsh/custom/t
 
 source $ZSH/oh-my-zsh.sh
 
+echo
+echo '> Configuring git'
 git config --global core.editor nvim
 git config --global user.name 'Alex Henkemeier'
+
+echo
+echo '> Finalizing 🔍'
+src ~/.zshrc
+tmux source ~/.tmux.conf &
+
+echo
+echo 'Done ✅'
+echo
+
+return
