@@ -8,8 +8,6 @@ vim.keymap.set("i", "<C-c>", "<Esc>")
 
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
 vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
-vim.keymap.set("n", "<C-j>", "5j", { remap=true, silent=true })
-vim.keymap.set("n", "<C-k>", "5k")
 
 vim.keymap.set("n", "J", "mzJ`z")
 
@@ -29,12 +27,7 @@ vim.keymap.set("v", "<leader>d", "\"_d")
 
 vim.keymap.set("n", "Q", "<nop>")
 
-vim.keymap.set("n", "<leader>f", function()
-    vim.lsp.buf.format()
-end)
 
-vim.keymap.set("n", "<M-p>", ":vertical resize +5<CR>", { silent = true })
-vim.keymap.set("n", "<M-m>", ":vertical resize -5<CR>", { silent = true })
 
 vim.keymap.set("n", "<leader>c", ':let @* = expand("%")<CR>', { silent = true })
 vim.keymap.set("n", "<leader>cc", ':let @+ = expand("%")<CR>', { silent = true })
@@ -42,7 +35,7 @@ vim.keymap.set("n", "<leader>cc", ':let @+ = expand("%")<CR>', { silent = true }
 vim.keymap.set("n", "<M-Tab>", ":cn<CR>")
 vim.keymap.set("n", "<M-S-Tab>", ":cp<CR>")
 
-if(not os.getenv('$TMUX'))
+if(os.getenv('$TMUX'))
 then
     vim.keymap.set("n", "<M-h>", ":wincmd h<CR>")
     vim.keymap.set("n", "<M-j>", ":wincmd j<CR>")
@@ -50,5 +43,31 @@ then
     vim.keymap.set("n", "<M-l>", ":wincmd l<CR>")
 end
 
+-- Simple Session Management
+vim.keymap.set("n", "<leader>sv", ":mksession! ~/.vim/vim_session<CR>")
+vim.keymap.set("n", "<leader>op", ":source ~/.vim/vim_session<CR>")
+
+-- editor navigation
+vim.keymap.set("n", "<leader>h", ":tabprevious<CR>", { silent = true })
+vim.keymap.set("n", "<leader>l", ":tabnext<CR>", { silent = true })
+
+-- pane controls
+vim.keymap.set("n", "<M-p>", ":vertical resize +5<CR>", { silent = true })
+vim.keymap.set("n", "<M-m>", ":vertical resize -5<CR>", { silent = true })
+
+-- Github Commands
 vim.keymap.set({"n", "v"}, "gh", function() CopyGithubURL() end)
 vim.keymap.set({"n", "v"}, "<leader>gh", function() CopyGithubURL(true) end)
+
+-- LSP based mappings
+vim.keymap.set("n", "<leader>rn", function()
+  vim.lsp.buf.rename()
+end, { noremap = true })
+
+vim.keymap.set("n", "<leader>f", function()
+    vim.lsp.buf.format({ async = true })
+end, {noremap = true, silent = true })
+
+-- nvim-tree
+vim.api.nvim_set_keymap("n", "<leader>H", ":NvimTreeToggle<CR>", { silent = true, noremap = true })
+

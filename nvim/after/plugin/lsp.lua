@@ -2,7 +2,7 @@ local lsp = require('lsp-zero')
 
 lsp.preset('recommended')
 
-lsp.ensure_installed({
+lsp_to_install = {
 	'bashls',
 	'eslint',
 	'graphql',
@@ -10,17 +10,21 @@ lsp.ensure_installed({
 	'rust_analyzer',
 	'solargraph',
 	'sorbet',
-	'sumneko_lua',
+	'lua_ls',
+  'pyright',
 	'texlab',
 	'tsserver',
 	'yamlls',
   'ltex',
-})
+}
+
+lsp.ensure_installed(lsp_to_install)
 
 lsp.on_attach(function(client, bufnr)
     local opts = {buffer = bufnr, remap = false}
 
     vim.keymap.set("n", "vd", function() vim.lsp.buf.definition() end, opts)
+    vim.keymap.set("n", "vD", function() vim.lsp.buf.type_definition() end, opts)
     vim.keymap.set("n", "K", function() vim.lsp.buf.hover() end, opts)
     vim.keymap.set("n", "vrr", function() vim.lsp.buf.references() end, opts)
     vim.keymap.set("n", "vrn", function() vim.lsp.buf.rename() end, opts)
@@ -37,7 +41,6 @@ vim.diagnostic.config({
   severity_sort = true,
   float = {
     focusable = false,
-    style = 'minimal',
     border = 'rounded',
     source = 'always',
     header = '',
