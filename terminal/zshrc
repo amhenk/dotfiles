@@ -10,7 +10,7 @@ source ~/dotfiles/terminal/custom/p10k-theme
    export EDITOR='nvim'
  fi
 
-plugins=(git vi-mode python macos brew virtualenv zsh-syntax-highlighting)
+plugins=(git python macos brew virtualenv zsh-syntax-highlighting)
 source $ZSH/oh-my-zsh.sh
 export GPG_TTY=$(tty)
 
