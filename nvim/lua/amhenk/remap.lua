@@ -71,3 +71,9 @@ end, {noremap = true, silent = true })
 -- nvim-tree
 vim.api.nvim_set_keymap("n", "<leader>H", ":NvimTreeToggle<CR>", { silent = true, noremap = true })
 
+-- ToggleTerm mappings
+vim.keymap.set("t", "<Esc>", "<C-\\><C-n>")
+-- default VSCode terminal style
+toggle_cmd = ":ToggleTerm size=40 direction=horizontal<CR>"
+vim.keymap.set("n", "<C-`>", toggle_cmd, {noremap = true, silent=true})
+vim.keymap.set("t", "<C-`>", "<C-\\><C-n>" .. toggle_cmd, {noremap = true, silent=true})
