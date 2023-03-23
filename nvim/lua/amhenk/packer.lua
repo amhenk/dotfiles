@@ -24,6 +24,7 @@ local function colorschemes(use)
     use 'sainnhe/edge'
     use 'NTBBloodbath/doom-one.nvim'
     use "cpea2506/one_monokai.nvim"
+    use "folke/tokyonight.nvim"
 end
 
 local function configure_lsp(use)
