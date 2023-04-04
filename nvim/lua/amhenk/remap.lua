@@ -48,8 +48,8 @@ vim.keymap.set("n", "<leader>sv", ":mksession! ~/.vim/vim_session<CR>")
 vim.keymap.set("n", "<leader>op", ":source ~/.vim/vim_session<CR>")
 
 -- editor navigation
-vim.keymap.set("n", "<leader>h", ":tabprevious<CR>", { silent = true })
-vim.keymap.set("n", "<leader>l", ":tabnext<CR>", { silent = true })
+vim.keymap.set("n", "<leader>h", ":bprevious<CR>", { silent = true })
+vim.keymap.set("n", "<leader>l", ":bnext<CR>", { silent = true })
 
 -- pane controls
 vim.keymap.set("n", "<M-p>", ":vertical resize +5<CR>", { silent = true })

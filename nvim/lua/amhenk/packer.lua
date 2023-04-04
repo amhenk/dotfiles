@@ -70,6 +70,15 @@ return require('packer').startup(function(use)
     colorschemes(use)
 
     use {
+      'akinsho/bufferline.nvim',
+      tag = "v3.*",
+      requires = 'nvim-tree/nvim-web-devicons',
+      config = function ()
+        vim.opt.termguicolors = true
+        require('bufferline').setup{}
+      end
+    }
+    use {
       'nvim-tree/nvim-tree.lua',
       requires = {
         'nvim-tree/nvim-web-devicons',
