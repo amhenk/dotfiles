@@ -70,6 +70,7 @@ end, {noremap = true, silent = true })
 
 -- nvim-tree
 vim.api.nvim_set_keymap("n", "<leader>H", ":NvimTreeToggle<CR>", { silent = true, noremap = true })
+vim.api.nvim_set_keymap("n", "<C-H>", ":NvimTreeFocus<CR>", { silent = true, noremap = true })
 
 -- ToggleTerm mappings
 vim.keymap.set("t", "<Esc>", "<C-\\><C-n>")
