@@ -72,9 +72,22 @@ end, {noremap = true, silent = true })
 vim.api.nvim_set_keymap("n", "<leader>H", ":NvimTreeToggle<CR>", { silent = true, noremap = true })
 vim.api.nvim_set_keymap("n", "<C-H>", ":NvimTreeFocus<CR>", { silent = true, noremap = true })
 
--- ToggleTerm mappings
-vim.keymap.set("t", "<Esc>", "<C-\\><C-n>")
--- default VSCode terminal style
-toggle_cmd = ":ToggleTerm size=40 direction=horizontal<CR>"
-vim.keymap.set("n", "<C-`>", toggle_cmd, {noremap = true, silent=true})
-vim.keymap.set("t", "<C-`>", "<C-\\><C-n>" .. toggle_cmd, {noremap = true, silent=true})
+-- Trouble mappings
+vim.keymap.set("n", "<leader>xx", "<cmd>TroubleToggle<cr>",
+  {silent = true, noremap = true}
+)
+vim.keymap.set("n", "<leader>xw", "<cmd>TroubleToggle workspace_diagnostics<cr>",
+  {silent = true, noremap = true}
+)
+vim.keymap.set("n", "<leader>xd", "<cmd>TroubleToggle document_diagnostics<cr>",
+  {silent = true, noremap = true}
+)
+vim.keymap.set("n", "<leader>xl", "<cmd>TroubleToggle loclist<cr>",
+  {silent = true, noremap = true}
+)
+vim.keymap.set("n", "<leader>xq", "<cmd>TroubleToggle quickfix<cr>",
+  {silent = true, noremap = true}
+)
+vim.keymap.set("n", "gR", "<cmd>TroubleToggle lsp_references<cr>",
+  {silent = true, noremap = true}
+)
