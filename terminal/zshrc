@@ -24,4 +24,6 @@ fi
 [ -f /opt/dev/dev.sh ] && source /opt/dev/dev.sh
 
 [[ -x /opt/homebrew/bin/brew ]] && eval $(/opt/homebrew/bin/brew shellenv)
-eval "$(rbenv init - zsh)"
+[[ -x /opt/rbenv/rbenv ]] && eval $(rbenv init - zsh)
+
+"$HOME/.zsh/powerlevel10k/gitstatus/install" -f
