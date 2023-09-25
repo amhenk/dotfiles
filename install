@@ -1,8 +1,5 @@
 #!/usr/bin/env zsh
 
-rm ~/.tmux.conf
-rm ~/.zshrc
-
 ln -s ~/dotfiles/terminal/tmux.conf ~/.tmux.conf
 ln -s ~/dotfiles/terminal/zshrc ~/.zshrc
 
@@ -16,8 +13,6 @@ echo '> Configuring Neovim'
 if [ ! $SPIN ]; then
     brew install --HEAD neovim
 fi
-
-rm -rf ~/.config/nvim
 
 # create a sym link to the nvim config
 ln -s ~/dotfiles/nvim ~/.config/nvim
