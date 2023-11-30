@@ -110,6 +110,8 @@ return require('packer').startup(function(use)
     end
   }
 
+  use "sindrets/diffview.nvim"
+
   configure_lsp(use)
 
   if packer_bootstrap then
