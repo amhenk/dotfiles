@@ -30,6 +30,12 @@ alias gd='git diff'
 alias glog="git log --graph --pretty=format:'%Cred%h%Creset %an: %s - %Creset %C(yellow)%d%Creset %Cgreen(%cr)%Creset' --abbrev-commit --date=relative"
 alias grim="git rebase -i master"
 alias gcl="git config --list"
+# Add everything and amend the previous commit and push (long hair don't care)
+function lhdc() {
+  git add -A;
+  git commit --amend --no-edit;
+  git push --force-with-lease;
+}
 
 alias tf='tail -f'
 
@@ -52,9 +58,11 @@ alias q=''
 
 # tmux
 alias stm='~/dotfiles/tmux'
+alias ta="tmux a"
 
 # Spin
 if [ "$SPIN" ]; then
     alias sc='systemctl'
     alias jc='journalctl'
 fi
+
