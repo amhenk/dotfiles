@@ -59,6 +59,9 @@ vim.keymap.set("n", "<M-m>", ":vertical resize -5<CR>", { silent = true })
 vim.keymap.set({"n", "v"}, "gh", function() CopyGithubURL() end)
 vim.keymap.set({"n", "v"}, "<leader>gh", function() CopyGithubURL(true) end)
 
+-- TestIt
+vim.keymap.set({"n", "v"}, "<leader>ti", function() TestIt() end)
+
 -- LSP based mappings
 vim.keymap.set("n", "<leader>rn", function()
   vim.lsp.buf.rename()
