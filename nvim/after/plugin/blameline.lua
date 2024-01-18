@@ -1,3 +1,4 @@
+--[[
 require("blame_line").setup {
     -- whether the blame line should be shown in visual modes
     show_in_visual = true,
@@ -44,3 +45,5 @@ require("blame_line").setup {
 require("blame_line").disable()
 
 vim.keymap.set("n", "<leader>b", ":BlameLineToggle<CR>")
+]]
+

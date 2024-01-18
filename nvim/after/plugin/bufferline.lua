@@ -7,7 +7,7 @@ require('bufferline').setup {
         text_align = "left"
       }
     },
-    buffer_close_icon = '',
+    buffer_close_icon = 'x',
     color_icons = true,
   }
 }
