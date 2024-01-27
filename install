@@ -12,6 +12,7 @@ echo
 echo '> Configuring Neovim'
 if [ ! $SPIN ]; then
     brew install --HEAD neovim
+    brew install fzf
 fi
 
 # create a sym link to the nvim config

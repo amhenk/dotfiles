@@ -56,10 +56,11 @@ return require('packer').startup(function(use)
   -- Packer can manage itself
   use 'wbthomason/packer.nvim'
   use {
-    'nvim-telescope/telescope.nvim', tag = '0.1.0',
+    'nvim-telescope/telescope.nvim', tag = '0.1.5',
     -- or                          , branch = '0.1.x',
     requires = { { 'nvim-lua/plenary.nvim' } }
   }
+  use { 'nvim-telescope/telescope-fzf-native.nvim', run = 'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build' }
 
   -- load colorschemes
   colorschemes(use) -- using packer.nvim
@@ -67,16 +68,11 @@ return require('packer').startup(function(use)
     "folke/trouble.nvim",
     requires = "nvim-tree/nvim-web-devicons",
     config = function()
-      require("trouble").setup{}
+      require("trouble").setup {}
     end
   }
 
   -- navigation
-  use {
-    'akinsho/bufferline.nvim',
-    tag = "v3.*",
-    requires = 'nvim-tree/nvim-web-devicons',
-  }
   use {
     'nvim-tree/nvim-tree.lua',
     requires = 'nvim-tree/nvim-web-devicons'
@@ -86,7 +82,6 @@ return require('packer').startup(function(use)
   use('nvim-treesitter/nvim-treesitter', { run = ':TSUpdate' })
   use('mbbill/undotree')
   use('tpope/vim-fugitive')
-  -- use('braxtons12/blame_line.nvim')
   use {
     'nvim-lualine/lualine.nvim',
     requires = { 'kyazdani42/nvim-web-devicons', opt = true }
@@ -113,6 +108,14 @@ return require('packer').startup(function(use)
   use "sindrets/diffview.nvim"
 
   configure_lsp(use)
+
+  use {
+    "folke/noice.nvim",
+    requires = {
+      "MunifTanjim/nui.nvim",
+      "rcarriga/nvim-notify",
+    }
+  }
 
   if packer_bootstrap then
     require('packer').sync()
