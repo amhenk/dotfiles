@@ -25,6 +25,7 @@ local function colorschemes(use)
   use 'NTBBloodbath/doom-one.nvim'
   use "cpea2506/one_monokai.nvim"
   use "folke/tokyonight.nvim"
+  use { "catppuccin/nvim", as = "catppuccin" }
 end
 
 local function configure_lsp(use)
@@ -61,6 +62,23 @@ return require('packer').startup(function(use)
     requires = { { 'nvim-lua/plenary.nvim' } }
   }
   use { 'nvim-telescope/telescope-fzf-native.nvim', run = 'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build' }
+  use {
+    'sudormrfbin/cheatsheet.nvim',
+
+    requires = {
+      { 'nvim-telescope/telescope.nvim' },
+      { 'nvim-lua/popup.nvim' },
+      { 'nvim-lua/plenary.nvim' },
+    }
+  }
+  use {
+    'benfowler/telescope-luasnip.nvim',
+
+    requires = {
+      { 'nvim-telescope/telescope.nvim' },
+      { 'L3MON4D3/LuaSnip' },
+    }
+  }
 
   -- load colorschemes
   colorschemes(use) -- using packer.nvim
