@@ -32,3 +32,6 @@ vim.keymap.set('n', ';tr', builtin.diagnostics, {})
 vim.keymap.set('n', ';sp', function()
   require('telescope').extensions.luasnip.luasnip({})
 end)
+
+-- Configure highlight groups
+vim.api.nvim_set_hl(0, "TelescopePreviewLine", { bg = "#f56942", fg = "#cfcfcf" })
