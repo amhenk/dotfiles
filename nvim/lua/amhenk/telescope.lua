@@ -13,7 +13,6 @@ require('telescope').setup({
       sort_lastused = true,
       sort_mru = true,
       previewer = true,
-      theme = "dropdown",
       mappings = {
         i = {
           ["<c-d>"] = "delete_buffer",
@@ -24,11 +23,6 @@ require('telescope').setup({
   defaults = {
     prompt_prefix = "🔎 ",
     dynamic_preview_title = true,
-    path_display = {
-      shorten = {
-        exclude = {1,2, -1}
-      },
-    },
     preview_title = "👀",
     entry_prefix = " ",
     selection_caret = "👉 ",
