@@ -1,5 +1,8 @@
 #!/usr/bin/env zsh
 
+rm ~/.tmux.conf
+rm ~/.zshrc
+
 ln -s ~/dotfiles/terminal/tmux.conf ~/.tmux.conf
 ln -s ~/dotfiles/terminal/zshrc ~/.zshrc
 
