@@ -14,6 +14,12 @@ vim.keymap.set('n', '<leader>gs', function()
   builtin.grep_string({ search = vim.fn.input("Grep > ") })
 end)
 
+vim.keymap.set('n', '<C-f>', function()
+  builtin.live_grep({
+    search_dirs = {vim.fn.expand("%:p")}
+  })
+end)
+
 vim.keymap.set('n', '<leader>fg', function()
   local p = io.popen('git diff --name-only main...; git diff --name-only; git ls-files --others --exclude-standard')
   local files = {}
