@@ -14,6 +14,7 @@ end
 local packer_bootstrap = ensure_packer()
 
 local function colorschemes(use)
+  use 'levouh/tint.nvim'
   use 'savq/melange-nvim'
   use {
     'rose-pine/neovim',
