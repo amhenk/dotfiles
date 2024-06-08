@@ -60,6 +60,10 @@ alias q=''
 alias stm='~/dotfiles/tmux'
 alias ta="tmux a"
 
+# Python
+alias python="python3"
+alias py="python
+
 # Spin
 if [ "$SPIN" ]; then
     alias sc='systemctl'

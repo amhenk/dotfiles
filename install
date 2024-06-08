@@ -10,12 +10,19 @@ if [ ! -d "~/.tmux/plugins/tpm" ] ; then
   git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 fi
 
+if ! command -v git >/dev/null 2>&1; then
+  echo "Git is not installed. Installing Git."
+  brew install git
+fi
+
 # Neovim
 echo
 echo '> Configuring Neovim'
 if [ ! $SPIN ]; then
-    brew install --HEAD neovim
-    brew install fzf
+  if ! command -v nvim >/dev/null 2>&1; then
+      brew install --HEAD neovim
+  fi
+  brew install fzf
 fi
 
 # create a sym link to the nvim config
