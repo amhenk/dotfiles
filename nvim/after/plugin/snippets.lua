@@ -8,6 +8,14 @@ local i = ls.insert_node
 ls.setup({})
 
 ls.add_snippets("ruby", {
+  s("ttf", {
+    t({ "# typed: true", "" }),
+    t({ "# frozen_string_literal: true", "" }),
+    t(""),
+  })
+})
+
+ls.add_snippets("ruby", {
   -- Add file boiler plate
   s("tf", {
     t({ "# typed: true", "" }),

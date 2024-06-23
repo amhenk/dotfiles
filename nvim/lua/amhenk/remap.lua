@@ -67,6 +67,7 @@ vim.keymap.set({"n", "v"}, "<leader>ti", function() TestIt() end)
 
 -- nvim-tree
 vim.api.nvim_set_keymap("n", "<leader>H", ":NvimTreeToggle<CR>", { silent = true, noremap = true })
+vim.api.nvim_set_keymap("n", ";H", ":NvimTreeFindFile<CR>", { silent = true, noremap = true })
 vim.api.nvim_set_keymap("n", "<C-H>", ":NvimTreeFocus<CR>", { silent = true, noremap = true })
 
 -- Trouble mappings

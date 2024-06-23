@@ -128,14 +128,6 @@ return require('packer').startup(function(use)
 
   configure_lsp(use)
 
-  use {
-    "folke/noice.nvim",
-    requires = {
-      "MunifTanjim/nui.nvim",
-      "rcarriga/nvim-notify",
-    }
-  }
-
   if packer_bootstrap then
     require('packer').sync()
   end

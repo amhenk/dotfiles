@@ -62,7 +62,7 @@ alias ta="tmux a"
 
 # Python
 alias python="python3"
-alias py="python
+alias py="python"
 
 # Spin
 if [ "$SPIN" ]; then
