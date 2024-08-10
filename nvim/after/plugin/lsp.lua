@@ -1,7 +1,7 @@
 local lsp = require('lsp-zero')
 local nvim_lsp = require('lspconfig')
 
-lsp.preset('recommended')
+-- lsp.preset('recommended')
 
 lsp_to_install = {
   'bashls',
