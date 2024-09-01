@@ -1,7 +1,12 @@
 local lsp = require('lsp-zero')
 local nvim_lsp = require('lspconfig')
 
--- lsp.preset('recommended')
+local function set_preset(lsp)
+  lsp.preset('recommended')
+end
+
+-- Try setting recommended, otherwise just ignore the error it throws
+local _ = pcall(set_preset, lsp)
 
 lsp_to_install = {
   'bashls',
@@ -56,7 +61,7 @@ require('mason-lspconfig').setup({
   handlers = { lsp.default_setup }
 })
 
--- lsp.setup()
+lsp.setup()
 
 vim.diagnostic.config({
   virtual_text = true,
@@ -73,3 +78,4 @@ vim.diagnostic.config({
     prefix = '',
   },
 })
+
