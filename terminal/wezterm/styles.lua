@@ -25,7 +25,7 @@ function _M.apply_to_config(config)
     bottom = "0cell",
   }
 
-  config.window_decorations = "RESIZE"
+  config.window_decorations = "INTEGRATED_BUTTONS|RESIZE"
 end
 
 return _M
