@@ -27,9 +27,9 @@ fi
 
 # create a sym link to the nvim config
 ln -s ~/dotfiles/nvim ~/.config/nvim
-if test -d ~/.config/wezterm
+if test -d ~/.config/wezterm; then
   mkdir -p $HOME/.config/wezterm
-end
+fi
 ln -s ~/dotfiles/terminal/wezterm ~/.config/wezterm
 
 nvim --headless -c 'autocmd User PackerComplete quitall' -c 'PackerSync'
