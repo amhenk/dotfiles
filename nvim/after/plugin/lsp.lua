@@ -1,14 +1,7 @@
 local lsp = require('lsp-zero')
 local nvim_lsp = require('lspconfig')
 
-local function set_preset(lsp)
-  lsp.preset('recommended')
-end
-
--- Try setting recommended, otherwise just ignore the error it throws
-local _ = pcall(set_preset, lsp)
-
-lsp_to_install = {
+local lsp_to_install = {
   'bashls',
   'eslint',
   'graphql',
@@ -19,7 +12,6 @@ lsp_to_install = {
   'lua_ls',
   'pyright',
   'texlab',
-  'tsserver',
   'yamlls',
   'ltex',
   'denols',
@@ -58,7 +50,9 @@ lsp.configure('denols', {
 require('mason').setup({})
 require('mason-lspconfig').setup({
   ensure_installed = lsp_to_install,
-  handlers = { lsp.default_setup }
+  handlers = {
+    lsp.default_setup,
+  }
 })
 
 lsp.setup()
@@ -79,3 +73,13 @@ vim.diagnostic.config({
   },
 })
 
+
+local cmp = require"cmp"
+
+cmp.setup {
+  sources = {
+    { name = "nvim_lsp" },
+    { name = "path" },
+    { name = "buffer" },
+  }
+}
