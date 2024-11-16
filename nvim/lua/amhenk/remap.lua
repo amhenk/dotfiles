@@ -70,6 +70,10 @@ vim.api.nvim_set_keymap("n", "<leader>H", ":NvimTreeToggle<CR>", { silent = true
 vim.api.nvim_set_keymap("n", ";H", ":NvimTreeFindFile<CR>", { silent = true, noremap = true })
 vim.api.nvim_set_keymap("n", "<C-H>", ":NvimTreeFocus<CR>", { silent = true, noremap = true })
 
+-- Diffview
+vim.api.nvim_set_keymap("n", "<leader>dvo", ":DiffviewOpen<CR>", { silent = true, noremap = true })
+vim.api.nvim_set_keymap("n", "<leader>dvc", ":DiffviewClose<CR>", { silent = true, noremap = true })
+
 ---------
 --- Diagnostic mappings
 ---------
