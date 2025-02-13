@@ -1,3 +1,22 @@
+local mode_map = {
+  ['NORMAL'] = 'N',
+  ['O-PENDING'] = 'N?',
+  ['INSERT'] = 'I',
+  ['VISUAL'] = 'V',
+  ['V-BLOCK'] = 'VB',
+  ['V-LINE'] = 'VL',
+  ['V-REPLACE'] = 'VR',
+  ['REPLACE'] = 'R',
+  ['COMMAND'] = '!',
+  ['SHELL'] = 'SH',
+  ['TERMINAL'] = 'T',
+  ['EX'] = 'X',
+  ['S-BLOCK'] = 'SB',
+  ['S-LINE'] = 'SL',
+  ['SELECT'] = 'S',
+  ['CONFIRM'] = 'Y?',
+  ['MORE'] = 'M',
+}
 require('lualine').setup {
   options = {
     icons_enabled = true,
@@ -18,10 +37,10 @@ require('lualine').setup {
     }
   },
   sections = {
-    lualine_a = {'mode'},
-    lualine_b = {'branch', 'diff', 'diagnostics'},
-    lualine_c = {'filename'},
-    lualine_x = {'encoding', 'fileformat', 'filetype'},
+    lualine_a = {{ 'mode', fmt = function(m) return mode_map[m] or m end }},
+    lualine_b = {'filename'},
+    lualine_c = {},
+    lualine_x = {'branch', 'diff', 'diagnostics'},
     lualine_y = {'progress'},
     lualine_z = {'location'}
   },
@@ -30,7 +49,7 @@ require('lualine').setup {
     lualine_b = {},
     lualine_c = {'filename'},
     lualine_x = {'location'},
-    lualine_y = {},
+    lualine_y = {'encoding', 'fileformat', 'filetype'},
     lualine_z = {}
   },
   tabline = {},
