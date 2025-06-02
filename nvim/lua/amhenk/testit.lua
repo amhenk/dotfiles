@@ -20,6 +20,8 @@ function TestIt()
   if (extension == 'rb')
   then
     test_cmd = 'dev test ' .. full_path
+  elseif (extension == 'tsx') then
+    test_cmd = 'yarn test ' .. full_path
   else
     -- We (you) don't support this yet
     return

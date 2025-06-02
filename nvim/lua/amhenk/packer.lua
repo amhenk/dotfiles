@@ -139,6 +139,7 @@ return require('packer').startup(function(use)
   }
 
   use "sindrets/diffview.nvim"
+  use "folke/zen-mode.nvim"
 
   configure_lsp(use)
 
