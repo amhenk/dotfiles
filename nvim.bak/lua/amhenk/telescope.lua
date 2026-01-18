@@ -7,6 +7,7 @@ require('telescope').setup({
     find_files = {
       prompt_title = "🤔",
       results_title = "",
+      hidden = true,
     },
     buffers = {
       show_all_buffers = true,
@@ -53,6 +54,9 @@ require('telescope').setup({
     borderchars = { "─", " ", "─", " ", "╭", "╮", "╯", "╰" },
     color_devicons = true,
     use_less = true,
+    file_ignore_patterns = {
+      "node_modules", "dist"
+    },
   },
 })
 

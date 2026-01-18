@@ -1,9 +1,8 @@
-# Fetch the docs using:
-# ghostty +show-config --docs
-# Also `man ghostty` is helpful
 theme = Gruvbox Material Dark
 
-# keybind = ctrl+h=goto_split:left
-# keybind = ctrl+j=goto_split:down
-# keybind = ctrl+k=goto_split:up
-# keybind = ctrl+l=goto_split:right
+split-divider-color=#d2d2d2
+
+font-size = 14
+# theme= Gruvbox Material Light
+window-inherit-working-directory = false
+working-directory = home

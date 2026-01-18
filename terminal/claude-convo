@@ -1,0 +1,420 @@
+#!/bin/bash
+#
+# claude-convo - Save, list, and resume Claude Code conversations
+#
+# Usage:
+#   claude-convo save <name> [session-id]  - Save current/specified session with a name
+#   claude-convo list                       - List saved conversations
+#   claude-convo resume <name> [prompt]     - Resume a saved conversation
+#   claude-convo pick                       - Interactive session picker (claude --resume)
+#   claude-convo run <name> <prompt>        - Run prompt in saved session, capture output
+#   claude-convo new <name> [prompt]        - Start new conversation with a name
+#   claude-convo artifact <name> <file>     - Save an artifact file to conversation folder
+#   claude-convo show <name>                - Show conversation metadata and artifacts
+
+CONVO_DIR="${CLAUDE_CONVO_DIR:-$HOME/src/claude-convos}"
+INDEX_FILE="$CONVO_DIR/index.json"
+
+# Ensure directory and index exist
+mkdir -p "$CONVO_DIR"
+[[ -f "$INDEX_FILE" ]] || echo '{}' > "$INDEX_FILE"
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+YELLOW='\033[0;33m'
+NC='\033[0m' # No Color
+
+usage() {
+    cat << 'EOF'
+claude-convo - Manage Claude Code conversations
+
+Usage:
+  claude-convo save <name> [session-id]     Save current/specified session with a name
+  claude-convo list                         List saved conversations
+  claude-convo resume <name> [prompt]       Resume a saved conversation interactively
+  claude-convo pick                         Interactive session picker
+  claude-convo run <name> <prompt>          Run prompt in saved session, capture output
+  claude-convo new <name> [prompt]          Start new conversation with a name
+  claude-convo artifact <name> <files...>   Save artifact files to conversation folder
+  claude-convo show <name>                  Show conversation metadata and artifacts
+  claude-convo delete <name>                Delete a saved conversation
+
+Environment:
+  CLAUDE_CONVO_DIR    Override default storage location (default: ~/src/claude-convos)
+
+Examples:
+  claude-convo save "refactor-auth"
+  claude-convo resume "refactor-auth" "continue where we left off"
+  claude-convo run "refactor-auth" "show me the current status" > output.md
+  claude-convo artifact "refactor-auth" ./schema.sql ./migration.sql
+EOF
+}
+
+get_session_id() {
+    local name="$1"
+    jq -r --arg name "$name" '.[$name].session_id // empty' "$INDEX_FILE"
+}
+
+get_convo_dir() {
+    local name="$1"
+    echo "$CONVO_DIR/convos/$name"
+}
+
+save_convo() {
+    local name="$1"
+    local session_id="$2"
+
+    if [[ -z "$name" ]]; then
+        echo -e "${RED}Error: Name required${NC}"
+        echo "Usage: claude-convo save <name> [session-id]"
+        return 1
+    fi
+
+    # If no session ID provided, try to get from most recent
+    if [[ -z "$session_id" ]]; then
+        echo -e "${YELLOW}No session ID provided. Use 'claude --resume' to find session IDs.${NC}"
+        echo "Then run: claude-convo save \"$name\" <session-id>"
+        echo ""
+        echo "Or start a new named conversation with: claude-convo new \"$name\""
+        return 1
+    fi
+
+    local convo_dir
+    convo_dir=$(get_convo_dir "$name")
+    mkdir -p "$convo_dir/artifacts"
+
+    # Update index
+    local now
+    now=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+    local tmp
+    tmp=$(mktemp)
+    jq --arg name "$name" \
+       --arg session_id "$session_id" \
+       --arg created "$now" \
+       --arg updated "$now" \
+       '.[$name] = {
+           session_id: $session_id,
+           created: (if .[$name].created then .[$name].created else $created end),
+           updated: $updated,
+           description: (.[$name].description // "")
+       }' "$INDEX_FILE" > "$tmp" && mv "$tmp" "$INDEX_FILE"
+
+    echo -e "${GREEN}Saved conversation '$name' with session ID: $session_id${NC}"
+    echo "Resume with: claude-convo resume \"$name\""
+}
+
+list_convos() {
+    if [[ ! -s "$INDEX_FILE" ]] || [[ "$(jq 'length' "$INDEX_FILE")" == "0" ]]; then
+        echo -e "${YELLOW}No saved conversations yet.${NC}"
+        echo "Save one with: claude-convo save <name> <session-id>"
+        return 0
+    fi
+
+    echo -e "${BLUE}Saved Conversations:${NC}"
+    echo ""
+    jq -r 'to_entries | sort_by(.value.updated) | reverse | .[] |
+        "\(.key)\t\(.value.session_id[0:8])...\t\(.value.updated // "unknown")"' "$INDEX_FILE" | \
+    while IFS=$'\t' read -r name sid updated; do
+        local artifact_count=0
+        local convo_dir
+        convo_dir=$(get_convo_dir "$name")
+        if [[ -d "$convo_dir/artifacts" ]]; then
+            artifact_count=$(find "$convo_dir/artifacts" -type f 2>/dev/null | wc -l | tr -d ' ')
+        fi
+        printf "  ${GREEN}%-20s${NC} %s  %s" "$name" "$sid" "$updated"
+        if [[ "$artifact_count" -gt 0 ]]; then
+            printf "  ${YELLOW}[%d artifacts]${NC}" "$artifact_count"
+        fi
+        echo ""
+    done
+}
+
+resume_convo() {
+    local name="$1"
+    shift
+    local prompt="$*"
+
+    if [[ -z "$name" ]]; then
+        echo -e "${RED}Error: Name required${NC}"
+        echo "Usage: claude-convo resume <name> [prompt]"
+        return 1
+    fi
+
+    local session_id
+    session_id=$(get_session_id "$name")
+
+    if [[ -z "$session_id" ]]; then
+        echo -e "${RED}Error: Conversation '$name' not found${NC}"
+        echo "Available conversations:"
+        list_convos
+        return 1
+    fi
+
+    # Update last accessed time
+    local now
+    now=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+    local tmp
+    tmp=$(mktemp)
+    jq --arg name "$name" --arg updated "$now" \
+       '.[$name].updated = $updated' "$INDEX_FILE" > "$tmp" && mv "$tmp" "$INDEX_FILE"
+
+    echo -e "${BLUE}Resuming '$name' (session: ${session_id:0:8}...)${NC}"
+
+    if [[ -n "$prompt" ]]; then
+        claude -r "$session_id" "$prompt"
+    else
+        claude -r "$session_id"
+    fi
+}
+
+run_convo() {
+    local name="$1"
+    shift
+    local prompt="$*"
+
+    if [[ -z "$name" ]] || [[ -z "$prompt" ]]; then
+        echo -e "${RED}Error: Name and prompt required${NC}"
+        echo "Usage: claude-convo run <name> <prompt>"
+        return 1
+    fi
+
+    local session_id
+    session_id=$(get_session_id "$name")
+
+    if [[ -z "$session_id" ]]; then
+        echo -e "${RED}Error: Conversation '$name' not found${NC}" >&2
+        return 1
+    fi
+
+    # Run non-interactively and capture output
+    claude -r "$session_id" --print "$prompt"
+}
+
+new_convo() {
+    local name="$1"
+    shift
+    local prompt="$*"
+
+    if [[ -z "$name" ]]; then
+        echo -e "${RED}Error: Name required${NC}"
+        echo "Usage: claude-convo new <name> [prompt]"
+        return 1
+    fi
+
+    # Check if name already exists
+    local existing
+    existing=$(get_session_id "$name")
+    if [[ -n "$existing" ]]; then
+        echo -e "${YELLOW}Warning: Conversation '$name' already exists.${NC}"
+        echo "Use 'claude-convo resume \"$name\"' to continue it."
+        echo "Or choose a different name."
+        return 1
+    fi
+
+    # Generate a new session ID
+    local session_id
+    session_id=$(uuidgen | tr '[:upper:]' '[:lower:]')
+
+    # Save it first
+    local convo_dir
+    convo_dir=$(get_convo_dir "$name")
+    mkdir -p "$convo_dir/artifacts"
+
+    local now
+    now=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+    local tmp
+    tmp=$(mktemp)
+    jq --arg name "$name" \
+       --arg session_id "$session_id" \
+       --arg created "$now" \
+       '.[$name] = {
+           session_id: $session_id,
+           created: $created,
+           updated: $created,
+           description: ""
+       }' "$INDEX_FILE" > "$tmp" && mv "$tmp" "$INDEX_FILE"
+
+    echo -e "${GREEN}Created new conversation '$name'${NC}"
+    echo -e "${BLUE}Session ID: $session_id${NC}"
+
+    if [[ -n "$prompt" ]]; then
+        claude --session-id "$session_id" "$prompt"
+    else
+        claude --session-id "$session_id"
+    fi
+}
+
+save_artifact() {
+    local name="$1"
+    shift
+    local files=("$@")
+
+    if [[ -z "$name" ]] || [[ ${#files[@]} -eq 0 ]]; then
+        echo -e "${RED}Error: Name and at least one file required${NC}"
+        echo "Usage: claude-convo artifact <name> <file1> [file2 ...]"
+        return 1
+    fi
+
+    local convo_dir
+    convo_dir=$(get_convo_dir "$name")
+    mkdir -p "$convo_dir/artifacts"
+
+    local saved=0
+    local failed=0
+
+    for file in "${files[@]}"; do
+        if [[ ! -f "$file" ]]; then
+            echo -e "${RED}Error: File '$file' not found, skipping${NC}"
+            ((failed++))
+            continue
+        fi
+
+        local basename
+        basename=$(basename "$file")
+        cp "$file" "$convo_dir/artifacts/$basename"
+        echo -e "${GREEN}Saved '$basename'${NC}"
+        ((saved++))
+    done
+
+    echo ""
+    echo -e "${GREEN}Saved $saved artifact(s) to conversation '$name'${NC}"
+    [[ $failed -gt 0 ]] && echo -e "${YELLOW}Failed to save $failed file(s)${NC}"
+}
+
+show_convo() {
+    local name="$1"
+
+    if [[ -z "$name" ]]; then
+        echo -e "${RED}Error: Name required${NC}"
+        echo "Usage: claude-convo show <name>"
+        return 1
+    fi
+
+    local session_id
+    session_id=$(get_session_id "$name")
+
+    if [[ -z "$session_id" ]]; then
+        echo -e "${RED}Error: Conversation '$name' not found${NC}"
+        return 1
+    fi
+
+    local convo_dir
+    convo_dir=$(get_convo_dir "$name")
+
+    echo -e "${BLUE}Conversation: $name${NC}"
+    echo ""
+    jq --arg name "$name" '.[$name]' "$INDEX_FILE"
+    echo ""
+
+    if [[ -d "$convo_dir/artifacts" ]]; then
+        local artifacts
+        artifacts=$(find "$convo_dir/artifacts" -type f 2>/dev/null)
+        if [[ -n "$artifacts" ]]; then
+            echo -e "${YELLOW}Artifacts:${NC}"
+            echo "$artifacts" | while read -r f; do
+                echo "  $(basename "$f")"
+            done
+        fi
+    fi
+
+    echo ""
+    echo "Resume with: claude-convo resume \"$name\""
+}
+
+delete_convo() {
+    local name="$1"
+
+    if [[ -z "$name" ]]; then
+        echo -e "${RED}Error: Name required${NC}"
+        echo "Usage: claude-convo delete <name>"
+        return 1
+    fi
+
+    local session_id
+    session_id=$(get_session_id "$name")
+
+    if [[ -z "$session_id" ]]; then
+        echo -e "${RED}Error: Conversation '$name' not found${NC}"
+        return 1
+    fi
+
+    # Confirm deletion
+    echo -e "${YELLOW}Delete conversation '$name'? (y/N)${NC}"
+    read -r confirm
+    if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
+        echo "Cancelled."
+        return 0
+    fi
+
+    local convo_dir
+    convo_dir=$(get_convo_dir "$name")
+
+    # Remove from index
+    local tmp
+    tmp=$(mktemp)
+    jq --arg name "$name" 'del(.[$name])' "$INDEX_FILE" > "$tmp" && mv "$tmp" "$INDEX_FILE"
+
+    # Remove artifacts directory if exists
+    if [[ -d "$convo_dir" ]]; then
+        rm -rf "$convo_dir"
+    fi
+
+    echo -e "${GREEN}Deleted conversation '$name'${NC}"
+}
+
+pick_session() {
+    claude --resume
+}
+
+# Main command dispatcher
+case "${1:-}" in
+    save)
+        shift
+        save_convo "$@"
+        ;;
+    list|ls)
+        list_convos
+        ;;
+    resume|r)
+        shift
+        resume_convo "$@"
+        ;;
+    pick|p)
+        pick_session
+        ;;
+    run)
+        shift
+        run_convo "$@"
+        ;;
+    new|n)
+        shift
+        new_convo "$@"
+        ;;
+    artifact|a)
+        shift
+        save_artifact "$@"
+        ;;
+    show|s)
+        shift
+        show_convo "$@"
+        ;;
+    delete|rm)
+        shift
+        delete_convo "$@"
+        ;;
+    help|-h|--help)
+        usage
+        ;;
+    "")
+        usage
+        ;;
+    *)
+        echo -e "${RED}Unknown command: $1${NC}"
+        usage
+        exit 1
+        ;;
+esac
