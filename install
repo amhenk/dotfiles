@@ -3,6 +3,7 @@
 rm ~/.tmux.conf
 rm ~/.zshrc
 
+# It's important when using `ln` to use the entire path
 ln -s ~/dotfiles/terminal/tmux.conf ~/.tmux.conf
 ln -s ~/dotfiles/terminal/zshrc ~/.zshrc
 

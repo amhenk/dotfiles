@@ -84,13 +84,15 @@ end,
 )
 -- Next Issue
 vim.keymap.set("n", "<leader>ni", function()
-  vim.diagnostic.goto_next()
+  local diagnostic =vim.diagnostic.jump({ count=1, float=true })
+  vim.lsp.buf.code_action({ context = { diagnostic = diagnostic } })
 end,
   {silent = true, noremap = true}
 )
 -- Previous Issue
 vim.keymap.set("n", "<leader>pi", function()
-  vim.diagnostic.goto_prev()
+  local diagnostic = vim.diagnostic.jump({ count=-1, float=true })
+  vim.lsp.buf.code_action({ context = { diagnostic = diagnostic } })
 end,
   {silent = true, noremap = true}
 )

@@ -11,19 +11,19 @@ local lsp_to_install = {
   'sorbet',
   'lua_ls',
   'pyright',
-  'texlab',
   'yamlls',
-  'ltex',
-  'denols',
+--  'denols',
 }
 
 lsp.on_attach(function(client, bufnr)
+  --[[
   if nvim_lsp.util.root_pattern("deno.json", "import_map.json")(vim.fn.getcwd()) then
     if client.name == "tsserver" then
       client.stop()
       return
     end
   end
+  ]]--
   local opts = { buffer = bufnr, remap = false }
 
   vim.keymap.set("n", "vd", function() vim.lsp.buf.definition() end, opts)

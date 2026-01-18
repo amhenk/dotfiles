@@ -90,8 +90,8 @@ return require('packer').startup(function(use)
       -- OR 'ibhagwan/fzf-lua',
       'nvim-tree/nvim-web-devicons',
     },
-    config = function ()
-      require"octo".setup()
+    config = function()
+      require "octo".setup()
     end
   }
 
@@ -120,10 +120,8 @@ return require('packer').startup(function(use)
     requires = { 'kyazdani42/nvim-web-devicons', opt = true }
   }
   use {
-    'mhinz/vim-startify',
-    config = function()
-      vim.g.startify_change_to_dir = 0
-    end
+    'goolord/alpha-nvim',
+    requires = { 'echasnovski/mini.icons' },
   }
   use {
     'lewis6991/gitsigns.nvim',

@@ -74,9 +74,13 @@ function _M.apply_to_config(config)
   config.key_tables = {
     resize_pane = {
       { key = "h",      action = action.AdjustPaneSize({ "Left", 1 }) },
+      { key = "H",      action = action.AdjustPaneSize({ "Left", 5 }) },
       { key = "j",      action = action.AdjustPaneSize({ "Down", 1 }) },
+      { key = "J",      action = action.AdjustPaneSize({ "Down", 5 }) },
       { key = "k",      action = action.AdjustPaneSize({ "Up", 1 }) },
+      { key = "K",      action = action.AdjustPaneSize({ "Up", 5 }) },
       { key = "l",      action = action.AdjustPaneSize({ "Right", 1 }) },
+      { key = "L",      action = action.AdjustPaneSize({ "Right", 5 }) },
       { key = "Escape", action = "PopKeyTable" },
       { key = "Enter",  action = "PopKeyTable" },
     },
@@ -89,8 +93,8 @@ function _M.apply_to_config(config)
       { key = "Enter",  action = "PopKeyTable" },
     },
     close_actions = {
-      { key = "t",      action = action.CloseCurrentTab({ confirm = false }) },
-      { key = "p",      action = action.CloseCurrentPane({ confirm = false }) },
+      { key = "t", action = action.CloseCurrentTab({ confirm = false }) },
+      { key = "p", action = action.CloseCurrentPane({ confirm = false }) },
     },
   }
 end
