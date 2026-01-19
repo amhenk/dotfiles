@@ -1,0 +1,66 @@
+# Config for https://starship.rs/. Requires a https://www.nerdfonts.com/ for that extra 𝓈𝒶𝓈𝓈
+# Safety Orange = #FF5F15
+
+format = """
+$directory $custom$git_state$git_status
+$character
+"""
+
+[character]
+success_symbol = "[●](green)"
+# success_symbol = "[ﮊ](bold #e3e3e3)[](black)"
+# error_symbol = "[ﮊ ](bold #e3e3e3 bg:#ff6b6b)[](#ff6b6b)"
+error_symbol = "[●](red)"
+
+[directory]
+truncation_length = 8
+home_symbol = "🏡"
+format = '[$path]($style)$read_only($read_only_style)'
+
+[directory.substitutions]
+'shop-server/areas/platforms/shop-server' = 'shop-server'
+'src/areas/' = ''
+
+[git_status]
+diverged = "🔱 🏎️ 💨 ×${ahead_count} 🐢 ×${behind_count}"
+staged = ' :${count} '
+modified = ':${count} '
+untracked = '??:${count}'
+conflicted = "❌ "
+style = "bold #f2f2f2 bg:#FF5F15"
+stashed = "$:${count}"
+format = '[ $all_status]($style)[](fg:#FF5F15)'
+# format = '[$up_to_date$conflicted$deleted$renamed$modified$staged$untracked$ahead_behind$stashed]($style)[](fg:#FF5F15)'
+
+[git_branch]
+disabled = true
+symbol = " "
+format = "[](fg:#FF5F15)[$symbol$branch]($style)"
+# style = "bold #ff6bee"
+style = "bold #f2f2f2 bg:#FF5F15"
+truncation_length = 40
+
+[custom.git_branch_custom]
+command = "git symbolic-ref --short HEAD"
+when = "git rev-parse --is-inside-work-tree >/dev/null 2>&1"
+symbol = " "
+format = "[](fg:#FF5F15)[$symbol$output]($style)"
+style = "bold #f2f2f2 bg:#FF5F15"
+
+[docker_context]
+symbol = " "
+
+[time]
+disabled = true
+use_12hr = true
+format = " [$time]($style) "
+
+[aws]
+symbol = "  "
+disabled = true
+
+[package]
+symbol = " "
+
+[python]
+symbol = " "
