@@ -1,17 +1,17 @@
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-fi
+# if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+#  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+# fi
 
 # removes goofy space on the right side of the prompt
 ZLE_RPROMPT_INDENT=0
 
 export ZSH=$HOME/.oh-my-zsh
 
-ZSH_THEME="powerlevel10k/powerlevel10k"
-source ~/dotfiles/terminal/custom/p10k-theme
+# ZSH_THEME="powerlevel10k/powerlevel10k"
+# source ~/dotfiles/terminal/custom/p10k-theme
 source ~/dotfiles/terminal/local/zshrc
 
 # Preferred editor for local and remote sessions
@@ -46,3 +46,7 @@ alias love=/Applications/love.app/Contents/MacOS/love
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+# Added by tec agent
+[[ -x /Users/amhenk/.local/state/tec/profiles/base/current/global/init ]] && eval "$(/Users/amhenk/.local/state/tec/profiles/base/current/global/init zsh)"
+
+eval "$(starship init zsh)"
