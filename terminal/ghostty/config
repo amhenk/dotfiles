@@ -1,4 +1,5 @@
-theme = Gruvbox Material Dark
+# theme = Gruvbox Material Dark
+theme = TokyoNight
 
 split-divider-color=#d2d2d2
 

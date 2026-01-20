@@ -1,4 +1,12 @@
 return {
+  -- add tokyonight
+  -- {
+  --   "folke/tokyonight.nvim",
+  --   lazy = false,
+  --   opts = {
+  --     style = "moon",
+  --   },
+  -- },
   -- add gruvbox
   {
     "ellisonleao/gruvbox.nvim",
@@ -15,7 +23,7 @@ return {
   {
     "LazyVim/LazyVim",
     opts = {
-      colorscheme = "gruvbox",
+      colorscheme = "tokyonight",
     },
   },
 }

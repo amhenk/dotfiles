@@ -12,3 +12,4 @@ opt.swapfile = false
 opt.undodir = os.getenv("HOME") .. "/.vim/undodir"
 opt.undofile = true
 opt.updatetime = 50
+opt.background = "dark"
