@@ -50,3 +50,7 @@ export NVM_DIR="$HOME/.nvm"
 [[ -x /Users/amhenk/.local/state/tec/profiles/base/current/global/init ]] && eval "$(/Users/amhenk/.local/state/tec/profiles/base/current/global/init zsh)"
 
 eval "$(starship init zsh)"
+# Homebrew (should come FIRST)
+eval "$(/opt/homebrew/bin/brew shellenv)"
+# tec profile (should come AFTER Homebrew)
+eval "$(~/.local/state/tec/profiles/base/current/global/init --zsh)"
