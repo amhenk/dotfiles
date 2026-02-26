@@ -6,7 +6,7 @@
 `./install`
 
 ### NeoVim
-When first opening `nvim` you may have to run `:PackerSync`
+When first opening `nvim` you may have to run `:Lazy sync`
 
 #### NeoVim Principles
 

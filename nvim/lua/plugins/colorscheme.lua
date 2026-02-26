@@ -1,25 +1,13 @@
 return {
-  -- add tokyonight
-  -- {
-  --   "folke/tokyonight.nvim",
-  --   lazy = false,
-  --   opts = {
-  --     style = "moon",
-  --   },
-  -- },
-  -- add gruvbox
   {
-    "ellisonleao/gruvbox.nvim",
-    config = true,
+    "folke/tokyonight.nvim",
+    lazy = false,
     opts = {
-      contrast = "hard",
-      overrides = {
-        ["@comment"] = { fg = "#000000" },
-      },
+      style = "moon",
     },
   },
 
-  -- Configure LazyVim to load gruvbox
+  -- Configure LazyVim to load tokyonight
   {
     "LazyVim/LazyVim",
     opts = {

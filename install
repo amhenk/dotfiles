@@ -1,11 +1,8 @@
 #!/usr/bin/env zsh
 
-rm ~/.tmux.conf
-rm ~/.zshrc
-
 # It's important when using `ln` to use the entire path
-ln -s ~/dotfiles/terminal/tmux.conf ~/.tmux.conf
-ln -s ~/dotfiles/terminal/zshrc ~/.zshrc
+ln -sf ~/dotfiles/terminal/tmux.conf ~/.tmux.conf
+ln -sf ~/dotfiles/terminal/zshrc ~/.zshrc
 
 if [ ! -d "~/.tmux/plugins/tpm" ] ; then
   git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
@@ -27,13 +24,13 @@ if [ ! $SPIN ]; then
 fi
 
 # create a sym link to the nvim config
-ln -s ~/dotfiles/nvim ~/.config/nvim
-if test -d ~/.config/wezterm; then
+ln -sf ~/dotfiles/nvim ~/.config/nvim
+if ! test -d ~/.config/wezterm; then
   mkdir -p $HOME/.config/wezterm
 fi
-ln -s ~/dotfiles/terminal/wezterm ~/.config/wezterm
+ln -sf ~/dotfiles/terminal/wezterm ~/.config/wezterm
 
-nvim --headless -c 'autocmd User PackerComplete quitall' -c 'PackerSync'
+nvim --headless "+Lazy! sync" +qa
 
 echo
 echo '> Configuring oh-my-zsh'
@@ -60,7 +57,7 @@ git config --global user.name 'Alex Henkemeier'
 
 echo
 echo '> Finalizing 🔍'
-src ~/.zshrc
+source ~/.zshrc
 tmux source ~/.tmux.conf &
 
 echo
