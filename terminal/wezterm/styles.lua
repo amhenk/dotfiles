@@ -3,9 +3,36 @@ local wezterm = require("wezterm")
 local _M = {}
 
 function _M.apply_to_config(config)
-  -- config.color_scheme = "Laserwave (Gogh)"
-  config.color_scheme = "Tokyo Night"
-  -- config.color_scheme = "Rose Pine"
+  -- Corporate Brutalist Theme
+  config.colors = {
+    foreground = "#ffffff",
+    background = "#000000",
+    cursor_bg = "#ff5f00",
+    cursor_fg = "#000000",
+    selection_bg = "#ff5f00",
+    selection_fg = "#000000",
+    ansi = {
+      "#000000", -- black
+      "#ff0000", -- red
+      "#00ff00", -- green
+      "#ffff00", -- yellow
+      "#0000ff", -- blue
+      "#ff00ff", -- magenta
+      "#00ffff", -- cyan
+      "#ffffff", -- white
+    },
+    brights = {
+      "#333333", -- grey
+      "#ff5f00", -- orange (accent)
+      "#00ff00",
+      "#ffff00",
+      "#0000ff",
+      "#ff00ff",
+      "#00ffff",
+      "#ffffff",
+    },
+  }
+
   config.font = wezterm.font_with_fallback({
     -- { family = "MesloLGS NF", font_size = 11.0, },
     { family = "FiraCode Nerd Font Mono", scale = 1.0, },

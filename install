@@ -23,12 +23,24 @@ if [ ! $SPIN ]; then
   brew install fzf
 fi
 
+configure_wezterm()
+{
+  if test -d ~/.config/wezterm; then
+    mkdir -p $HOME/.config/wezterm
+  fi
+  ln -s ~/dotfiles/terminal/wezterm ~/.config/wezterm
+}
+
+configure_starship()
+{
+  if ! command -v starship >/dev/null 2>&1; then
+    brew install starship
+  fi
+  ln -s ~/dotfiles/terminal/starship.toml ~/.config/starship.toml
+}
+
 # create a sym link to the nvim config
-ln -sf ~/dotfiles/nvim ~/.config/nvim
-if ! test -d ~/.config/wezterm; then
-  mkdir -p $HOME/.config/wezterm
-fi
-ln -sf ~/dotfiles/terminal/wezterm ~/.config/wezterm
+ln -s ~/dotfiles/nvim ~/.config/nvim
 
 nvim --headless "+Lazy! sync" +qa
 
@@ -57,7 +69,12 @@ git config --global user.name 'Alex Henkemeier'
 
 echo
 echo '> Finalizing 🔍'
+<<<<<<< Updated upstream
 source ~/.zshrc
+=======
+touch ~/dotfiles/terminal/local/zshrc
+src ~/.zshrc
+>>>>>>> Stashed changes
 tmux source ~/.tmux.conf &
 
 echo
