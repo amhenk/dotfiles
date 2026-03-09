@@ -17,7 +17,12 @@ source ~/dotfiles/terminal/local/zshrc
 
 export EDITOR='nvim'
 
-plugins=(git python macos brew virtualenv zsh-syntax-highlighting)
+# Homebrew (must come before oh-my-zsh and tec)
+eval "$(/opt/homebrew/bin/brew shellenv)"
+# tec profile (must come after Homebrew so tec tools take precedence)
+[[ -x ~/.local/state/tec/profiles/base/current/global/init ]] && eval "$(~/.local/state/tec/profiles/base/current/global/init zsh)"
+
+plugins=(git python macos virtualenv zsh-syntax-highlighting)
 source $ZSH/oh-my-zsh.sh
 export GPG_TTY=$(tty)
 
@@ -35,15 +40,26 @@ export PATH=$PATH:$ANDROID_HOME/emulator
 export PATH=$PATH:$ANDROID_HOME/platform-tools
 alias love=/Applications/love.app/Contents/MacOS/love
 
-. /opt/homebrew/opt/asdf/libexec/asdf.sh
+# . /opt/homebrew/opt/asdf/libexec/asdf.sh
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 eval "$(starship init zsh)"
 
-# Homebrew (should come FIRST)
-eval "$(/opt/homebrew/bin/brew shellenv)"
-# tec profile (should come AFTER Homebrew)
 [[ -x ~/.local/state/tec/profiles/base/current/global/init ]] && eval "$(~/.local/state/tec/profiles/base/current/global/init --zsh)"
 export PATH="$HOME/.antigravity/antigravity/bin:$PATH"
+
+if [[ -n "$GHOSTTY_RESOURCES_DIR" ]]; then
+  typeset -g _GHOSTTY_REAL_HOST="$(hostname)"
+  _fix_ghostty_cwd() {
+    if (( $+functions[_ghostty_report_pwd] )); then
+      _ghostty_report_pwd() {
+        builtin print -nu $_ghostty_fd '\e]7;kitty-shell-cwd://'"$_GHOSTTY_REAL_HOST""$PWD"'\a'
+      }
+      _ghostty_report_pwd
+      precmd_functions=(${precmd_functions:#_fix_ghostty_cwd})
+    fi
+  }
+  precmd_functions+=(_fix_ghostty_cwd)
+fi

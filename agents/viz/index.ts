@@ -4,14 +4,21 @@ import { Engine } from "./engine";
 import { Cube } from "./shapes/cube";
 import { Torus } from "./shapes/torus";
 import { Sphere } from "./shapes/sphere";
+import { GameOfLife } from "./shapes/game_of_life";
 import { Shape } from "./types";
 
 const TICK_MS = 30;
+const MAX_LOGS = 200;
 
 let status: "idle" | "working" | "complete" = "idle";
 const logs: string[] = [];
 const agentMap = new Map<string, number>();
 let nextAgentId = 1;
+
+function pushLog(line: string) {
+  logs.push(line);
+  if (logs.length > MAX_LOGS) logs.splice(0, logs.length - MAX_LOGS);
+}
 
 export default function (pi: ExtensionAPI) {
   const engine = new Engine();
@@ -19,47 +26,17 @@ export default function (pi: ExtensionAPI) {
     cube: new Cube(),
     torus: new Torus(),
     sphere: new Sphere(),
+    life: new GameOfLife(),
   };
   
   let activeShapeName = "cube";
   let interval: ReturnType<typeof setInterval> | null = null;
   let tuiHandle: any = null;
 
-  // Persistence: Restore shape from session if available
-  pi.on("session_start", async (_event, ctx) => {
-    for (const entry of ctx.sessionManager.getEntries()) {
-      if (entry.type === "custom" && entry.customType === "viz-settings") {
-        if (shapes[entry.data.shape]) {
-          activeShapeName = entry.data.shape;
-        }
-      }
-    }
-    
-    updateWidget(ctx);
-    
-    // Custom footer to remove built-in spinner
-    ctx.ui.setFooter((tui, theme, footerData) => ({
-      invalidate: () => { },
-      render: (width) => {
-        const branch = footerData.getGitBranch();
-        const model = ctx.model?.id || "";
-        const branchDisplay = branch ? theme.fg("accent", `[${branch}] `) : "";
-        const modelDisplay = theme.fg("muted", `[${model}]`);
-        const shapeDisplay = theme.fg("dim", ` (Viz: ${activeShapeName})`);
-        return [branchDisplay + modelDisplay + shapeDisplay];
-      },
-      dispose: footerData.onBranchChange(() => tui.requestRender()),
-    }));
-
-    if (!interval) {
-      interval = setInterval(() => {
-        shapes[activeShapeName].tick(status === "working");
-        tuiHandle?.requestRender();
-      }, TICK_MS);
-    }
-  });
-
-  const updateWidget = (ctx: any) => {
+  // Register the widget once — the render callback reads module-level
+  // state (`status`, `logs`, `activeShapeName`) by reference, so it
+  // always sees the latest values without needing to be re-registered.
+  const registerWidget = (ctx: any) => {
     ctx.ui.setWidget("viz-header", (tui: any, theme: Theme) => {
       tuiHandle = tui;
       return {
@@ -85,12 +62,31 @@ export default function (pi: ExtensionAPI) {
     }, { placement: "aboveMessages" });
   };
 
-  pi.on("agent_start", (event, ctx) => {
+  // Persistence: Restore shape from session if available
+  pi.on("session_start", async (_event, ctx) => {
+    for (const entry of ctx.sessionManager.getEntries()) {
+      if (entry.type === "custom" && entry.customType === "viz-settings") {
+        if (shapes[entry.data.shape]) {
+          activeShapeName = entry.data.shape;
+        }
+      }
+    }
+    
+    registerWidget(ctx);
+
+    if (!interval) {
+      interval = setInterval(() => {
+        shapes[activeShapeName].tick(status === "working");
+        tuiHandle?.requestRender();
+      }, TICK_MS);
+    }
+  });
+
+  pi.on("agent_start", (_event, ctx) => {
     status = "working";
     agentMap.clear();
     nextAgentId = 1;
     ctx.ui.setWorkingMessage("");
-    updateWidget(ctx);
   });
 
   pi.on("tool_execution_start", (event: any, ctx: any) => {
@@ -106,25 +102,22 @@ export default function (pi: ExtensionAPI) {
     const idStr = theme.fg(agentId === 0 ? "accent" : "warning", `[${agentId}]`);
     const toolStr = theme.fg("text", `[${event.toolName.toUpperCase()}]`);
     const detail = event.args.path || event.args.command || event.args.name || event.args.prompt || "";
-    logs.push(`${idStr}${toolStr} ${detail.slice(0, 60)}`);
-    updateWidget(ctx);
+    pushLog(`${idStr}${toolStr} ${detail.slice(0, 60)}`);
   });
 
-  pi.on("agent_end", (event, ctx) => {
+  pi.on("agent_end", (_event, ctx) => {
     status = "complete";
     ctx.ui.setWorkingMessage();
-    updateWidget(ctx);
   });
 
   pi.registerCommand("viz", {
-    description: "Configure the visualization (shape: cube, torus, sphere)",
+    description: "Configure the visualization (shape: cube, torus, sphere, life)",
     handler: async (args, ctx) => {
       const shape = args?.toLowerCase().trim();
       if (shapes[shape]) {
         activeShapeName = shape;
         pi.appendEntry("viz-settings", { shape: activeShapeName });
         ctx.ui.notify(`Visualization shape changed to ${shape}`, "info");
-        updateWidget(ctx);
       } else {
         ctx.ui.notify(`Available shapes: ${Object.keys(shapes).join(", ")}`, "warning");
       }
@@ -136,7 +129,6 @@ export default function (pi: ExtensionAPI) {
     handler: async (_args, ctx) => {
       logs.length = 0;
       status = "idle";
-      updateWidget(ctx);
     }
   });
 }
