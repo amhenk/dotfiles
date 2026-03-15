@@ -8,9 +8,6 @@ export class Sphere implements Shape {
   private edges: [number, number][] = [];
   private octants: number[] = []; // Maps vertex index to octant index (0-7)
   private expansion = 0;
-  private targetExpansion = 0;
-  private throbMin = 0.2;
-  private throbMax = 0.8;
   
   // Core vertices/edges
   private coreVertices: Point3D[] = [];
@@ -18,8 +15,8 @@ export class Sphere implements Shape {
 
   constructor() {
     const radius = 1.2;
-    const latLines = 8;
-    const lonLines = 12;
+    const latLines = 12;
+    const lonLines = 18;
 
     // Generate Sphere
     for (let i = 0; i <= latLines; i++) {
@@ -68,20 +65,8 @@ export class Sphere implements Shape {
     this.angleX += spinSpeed;
     this.angleY += spinSpeed * 0.7;
 
-    if (isWorking) {
-      // Pick a new random target when we're close to the current one
-      const distance = Math.abs(this.expansion - this.targetExpansion);
-      if (distance < 0.05) {
-        this.targetExpansion = this.throbMin + Math.random() * (this.throbMax - this.throbMin);
-      }
-      // Smooth lerp — varies speed so it doesn't feel mechanical
-      const lerpSpeed = 0.04 + Math.random() * 0.04;
-      this.expansion += (this.targetExpansion - this.expansion) * lerpSpeed;
-    } else {
-      // Collapse back to closed
-      this.targetExpansion = 0;
-      this.expansion += (0 - this.expansion) * 0.1;
-    }
+    const targetExpansion = isWorking ? 0.6 : 0;
+    this.expansion += (targetExpansion - this.expansion) * 0.1;
   }
 
   getVertices(): Point3D[] {

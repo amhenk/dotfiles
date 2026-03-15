@@ -12,8 +12,8 @@ export class Torus implements Shape {
   constructor() {
     const R = 1.2; // Major radius
     const r = 0.5; // Minor radius
-    const rings = 16;
-    const pointsPerRing = 10;
+    const rings = 24;
+    const pointsPerRing = 12;
 
     for (let i = 0; i < rings; i++) {
       const phi = (i / rings) * Math.PI * 2;

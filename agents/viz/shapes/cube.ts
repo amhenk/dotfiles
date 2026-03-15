@@ -12,17 +12,38 @@ export class Cube implements Shape {
   private targetVelocityY = 0.03;
   private targetVelocityZ = 0.02;
 
-  private vertices: Point3D[] = [
-    { x: -1, y: -1, z: -1 }, { x: 1, y: -1, z: -1 },
-    { x: 1, y: 1, z: -1 }, { x: -1, y: 1, z: -1 },
-    { x: -1, y: -1, z: 1 }, { x: 1, y: -1, z: 1 },
-    { x: 1, y: 1, z: 1 }, { x: -1, y: 1, z: 1 },
-  ];
-  private edges: [number, number][] = [
-    [0, 1], [1, 2], [2, 3], [3, 0],
-    [4, 5], [5, 6], [6, 7], [7, 4],
-    [0, 4], [1, 5], [2, 6], [3, 7],
-  ];
+  private vertices: Point3D[] = [];
+  private edges: [number, number][] = [];
+
+  constructor() {
+    // Generate a subdivided cube for better noise displacement
+    const subdivisions = 4;
+    for (let face = 0; face < 6; face++) {
+      for (let i = 0; i <= subdivisions; i++) {
+        for (let j = 0; j <= subdivisions; j++) {
+          const u = (i / subdivisions) * 2 - 1;
+          const v = (j / subdivisions) * 2 - 1;
+          let x, y, z;
+          if (face === 0) { x = u; y = v; z = 1; }
+          else if (face === 1) { x = u; y = v; z = -1; }
+          else if (face === 2) { x = u; y = 1; z = v; }
+          else if (face === 3) { x = u; y = -1; z = v; }
+          else if (face === 4) { x = 1; y = u; z = v; }
+          else { x = -1; y = u; z = v; }
+          
+          const vIdx = this.vertices.length;
+          this.vertices.push({ x, y, z });
+
+          if (i < subdivisions) {
+            this.edges.push([vIdx, vIdx + (subdivisions + 1)]);
+          }
+          if (j < subdivisions) {
+            this.edges.push([vIdx, vIdx + 1]);
+          }
+        }
+      }
+    }
+  }
 
   tick(isWorking: boolean) {
     if (Math.random() < 0.02) {

@@ -12,5 +12,8 @@ export interface Shape {
 
 export interface VizConfig {
   shape: string;
-  speedMultiplier: number;
+  noiseStrength: number;
+  vizWidth: number;
+  vizHeight: number;
+  tickRate: number;
 }

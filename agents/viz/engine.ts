@@ -1,5 +1,6 @@
 import { Theme, truncateToWidth } from "@mariozechner/pi-coding-agent";
-import { Point3D, Point2D, Shape } from "./types";
+import { Point3D, Point2D, Shape, VizConfig } from "./types";
+import { perlin } from "./noise";
 
 export class BrailleCanvas {
   private pixels: Uint8Array;
@@ -37,14 +38,19 @@ export class BrailleCanvas {
 }
 
 export class Engine {
-  private angleX = 0;
-  private angleY = 0;
-  private angleZ = 0;
+  private noiseOffset = 0;
+  private noiseIntensity = 0;
 
-  render(shape: Shape, width: number, height: number, theme: Theme, color: any): string[] {
+  render(shape: Shape, theme: Theme, color: any, isWorking: boolean, config: VizConfig): string[] {
+    const { vizWidth: width, vizHeight: height, noiseStrength } = config;
     const canvas = new BrailleCanvas(width, height);
     const pixelWidth = width * 2;
     const pixelHeight = height * 4;
+
+    // Update global noise state
+    const targetIntensity = isWorking ? 1.0 : 0.0;
+    this.noiseIntensity += (targetIntensity - this.noiseIntensity) * 0.05;
+    this.noiseOffset += isWorking ? 0.08 : 0.01;
 
     const vertices = shape.getVertices();
     const edges = shape.getEdges();
@@ -52,8 +58,18 @@ export class Engine {
     const projectedVertices = vertices.map((v) => {
       let { x, y, z } = v;
       
-      // The shape itself handles internal rotation/scaling in its tick()
-      // but we apply the projection here.
+      // Global Noise Filter
+      if (this.noiseIntensity > 0.001) {
+        const noiseVal = perlin.noise(
+          x + this.noiseOffset, 
+          y + this.noiseOffset, 
+          z + this.noiseOffset
+        );
+        const disp = 1 + (noiseVal * noiseStrength * this.noiseIntensity);
+        x *= disp; y *= disp; z *= disp;
+      }
+
+      // Project
       const perspective = 4;
       const scale = Math.min(pixelWidth, pixelHeight) * 0.8;
       const factor = scale / (z + perspective);
