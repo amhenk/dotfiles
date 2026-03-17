@@ -19,10 +19,18 @@ const DEFAULT_CONFIG: VizConfig = {
   tickRate: 30,
 };
 
+const TICK_MS = 30;
+const MAX_LOGS = 200;
+
 let status: "idle" | "working" | "complete" = "idle";
 const logs: string[] = [];
 const agentMap = new Map<string, number>();
 let nextAgentId = 1;
+
+function pushLog(line: string) {
+  logs.push(line);
+  if (logs.length > MAX_LOGS) logs.splice(0, logs.length - MAX_LOGS);
+}
 
 export default function (pi: ExtensionAPI) {
   const engine = new Engine();
@@ -68,7 +76,7 @@ export default function (pi: ExtensionAPI) {
   pi.on("session_start", async (_event, ctx) => {
     loadConfig();
     updateWidget(ctx);
-    
+
     ctx.ui.setFooter((tui, theme, footerData) => ({
       invalidate: () => { },
       render: (width) => {
@@ -85,6 +93,9 @@ export default function (pi: ExtensionAPI) {
     startLoop(ctx);
   });
 
+  // Register the widget once — the render callback reads module-level
+  // state (`status`, `logs`, `activeShapeName`) by reference, so it
+  // always sees the latest values without needing to be re-registered.
   const updateWidget = (ctx: any) => {
     ctx.ui.setWidget("viz-header", (tui: any, theme: Theme) => {
       tuiHandle = tui;
@@ -92,7 +103,7 @@ export default function (pi: ExtensionAPI) {
         render: (width: number) => {
           const { vizWidth, vizHeight } = config;
           const color = status === "working" ? "accent" : (status === "complete" ? "success" : "dim");
-          
+
           const shape = shapes[config.shape] || shapes.cube;
           const vizLines = engine.render(shape, theme, color, status === "working", config);
 
@@ -112,12 +123,31 @@ export default function (pi: ExtensionAPI) {
     }, { placement: "aboveMessages" });
   };
 
-  pi.on("agent_start", (event, ctx) => {
+  // Persistence: Restore shape from session if available
+  pi.on("session_start", async (_event, ctx) => {
+    for (const entry of ctx.sessionManager.getEntries()) {
+      if (entry.type === "custom" && entry.customType === "viz-settings") {
+        if (shapes[entry.data.shape]) {
+          activeShapeName = entry.data.shape;
+        }
+      }
+    }
+
+    updateWidget(ctx);
+
+    if (!interval) {
+      interval = setInterval(() => {
+        shapes[activeShapeName].tick(status === "working");
+        tuiHandle?.requestRender();
+      }, TICK_MS);
+    }
+  });
+
+  pi.on("agent_start", (_event, ctx) => {
     status = "working";
     agentMap.clear();
     nextAgentId = 1;
     ctx.ui.setWorkingMessage("");
-    updateWidget(ctx);
   });
 
   pi.on("tool_execution_start", (event: any, ctx: any) => {
@@ -133,14 +163,12 @@ export default function (pi: ExtensionAPI) {
     const idStr = theme.fg(agentId === 0 ? "accent" : "warning", `[${agentId}]`);
     const toolStr = theme.fg("text", `[${event.toolName.toUpperCase()}]`);
     const detail = event.args.path || event.args.command || event.args.name || event.args.prompt || "";
-    logs.push(`${idStr}${toolStr} ${detail.slice(0, 60)}`);
-    updateWidget(ctx);
+    pushLog(`${idStr}${toolStr} ${detail.slice(0, 60)}`);
   });
 
-  pi.on("agent_end", (event, ctx) => {
+  pi.on("agent_end", (_event, ctx) => {
     status = "complete";
     ctx.ui.setWorkingMessage();
-    updateWidget(ctx);
   });
 
   pi.registerCommand("viz", {
@@ -192,7 +220,6 @@ export default function (pi: ExtensionAPI) {
     handler: async (_args, ctx) => {
       logs.length = 0;
       status = "idle";
-      updateWidget(ctx);
     }
   });
 }
